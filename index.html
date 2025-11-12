@@ -1,53 +1,9 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suivi Dépenses Pro</title>
-  <script src="https://js.stripe.com/v3/"></script>
-  <style>
-    body { font-family: Arial; text-align: center; background: #f4f4f4; margin: 0; padding: 20px; }
-    h1 { color: #2c3e50; }
-    .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    input, button { padding: 12px; margin: 10px; font-size: 16px; width: 80%; }
-    button { background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    button:hover { background: #219653; }
-    .price { font-size: 28px; color: #27ae60; font-weight: bold; margin: 20px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Suivi Dépenses Pro</h1>
-    <p>Scannez vos factures → Rapport PDF auto → Envoyé au comptable</p>
-    <input type="file" id="facture" accept="image/*">
-    <button onclick="scan()">Scanner Facture</button>
-    <p class="price">49 € / mois</p>
-    <button id="checkout-button">Payer avec Stripe</button>
-    <p id="result" style="margin-top:20px; font-weight:bold;"></p>
-  </div>
+<script>
+  function scan() {
+    document.getElementById("result").innerHTML = "Facture scannée : McDo 12,90 € → Catégorie : Restauration";
+  }
 
-  <script>
-    const stripe = Stripe('pk_test_51SSfm6J5kUYnkFiUAI90qtKYCeTK2EInJzdZgnVAVUp3VwyBLEExoYR9dwRgv3WCckg3MIbhE15TfzNJqOsaEN9100Lg7Oawdg');
-
-    document.getElementById('checkout-button').addEventListener('click', function() {
-      fetch('https://api.stripe.com/v1/checkout/sessions', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer sk_test_XXXXXXXXXXXXXXXXXXXXXXXX',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'payment_method_types[]=card&mode=subscription&subscription_data[items][0][price]=price_1SSg06J5kUYnkFiUNZYmDcIe&success_url=https://cedric-ht.github.io/suivi-depenses/success.html&cancel_url=https://cedric-ht.github.io/suivi-depenses/'
-      })
-      .then(response => response.json())
-      .then(session => {
-        return stripe.redirectToCheckout({ sessionId: session.id });
-      })
-      .catch(err => console.error(err));
-    });
-
-    function scan() {
-      document.getElementById("result").innerHTML = "Facture scannée : McDo 12,90 € → Catégorie : Restauration";
-    }
-  </script>
-</body>
-</html>
+  function payer() {
+    window.location.href = "https://buy.stripe.com/test_3cs8wV7yZ3kZ9wE000"; // LIEN TEST
+  }
+</script>
