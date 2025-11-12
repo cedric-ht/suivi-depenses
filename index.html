@@ -1,9 +1,38 @@
-<script>
-  function scan() {
-    document.getElementById("result").innerHTML = "Facture scannée : McDo 12,90 € → Catégorie : Restauration";
-  }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suivi Dépenses Pro</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f4f4f4; margin: 0; padding: 20px; }
+    h1 { color: #2c3e50; }
+    .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    input, button { padding: 12px; margin: 10px; font-size: 16px; width: 80%; }
+    button { background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #219653; }
+    .price { font-size: 28px; color: #27ae60; font-weight: bold; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Suivi Dépenses Pro</h1>
+    <p>Scannez vos factures → Rapport PDF auto → Envoyé au comptable</p>
+    <input type="file" id="facture" accept="image/*">
+    <button onclick="scan()">Scanner Facture</button>
+    <p class="price">49 € / mois</p>
+    <button onclick="payer()">Payer avec Stripe</button>
+    <p id="result" style="margin-top:20px; font-weight:bold;"></p>
+  </div>
 
-  function payer() {
-    window.location.href = "https://buy.stripe.com/test_3cs8wV7yZ3kZ9wE000"; // LIEN TEST
-  }
-</script>
+  <script>
+    function scan() {
+      document.getElementById("result").innerHTML = "Facture scannée : McDo 12,90 € → Catégorie : Restauration";
+    }
+
+    function payer() {
+      window.location.href = "https://buy.stripe.com/test_3cs8wV7yZ3kZ9wE000";
+    }
+  </script>
+</body>
+</html>
