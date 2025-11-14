@@ -23,14 +23,12 @@
     <p>Vos TPE envoient photo → PDF auto → import direct dans Pennylane</p>
     <p style="font-weight:bold; color:#e74c3c;">7 jours GRATUIT – Annulation quand tu veux</p>
 
-    <!-- PAYWALL -->
     <div id="paywall">
       <p class="price">49 € / mois</p>
       <button id="checkout-button">S'abonner (7 jours gratuit)</button>
-      <p><small>Accès illimité après paiement</small></p>
+      <p><small>Carte requise – Annulation 1 clic</small></p>
     </div>
 
-    <!-- SCANNER (BLOQUÉ JUSQU'AU PAIEMENT) -->
     <div id="scanner" class="locked">
       <input type="file" id="facture" accept="image/*">
       <input type="email" id="tpeEmail" placeholder="Email du TPE">
@@ -41,23 +39,31 @@
   </div>
 
   <script>
-    const stripe = Stripe('pk_test_51...'); // ← MET TA CLÉ STRIPE ICI
-    let isPaid = false;
+    const stripe = Stripe('pk_test_51...'); // ← TA CLÉ PUBLIABLE STRIPE
+    const PRICE_ID = 'price_1Q...'; // ← TON ID DE PRIX STRIPE
 
-    // Simule un paiement (à remplacer par un vrai webhook plus tard)
     document.getElementById('checkout-button').addEventListener('click', () => {
-      // Simulation de paiement réussi
-      setTimeout(() => {
-        isPaid = true;
-        document.getElementById('paywall').style.display = 'none';
-        document.getElementById('scanner').classList.remove('locked');
-        document.getElementById('scan-btn').disabled = false;
-        document.getElementById('result').innerHTML = '<p style="color:green;">Abonnement activé ! Vous pouvez scanner.</p>';
-      }, 1000);
+      fetch('https://ton-serveur.com/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: PRICE_ID })
+      })
+      .then(res => res.json())
+      .then(session => stripe.redirectToCheckout({ sessionId: session.id }));
     });
 
+    // VÉRIFIE SI L'UTILISATEUR EST PAYANT (via cookie ou URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('paid') === 'true') {
+      document.getElementById('paywall').style.display = 'none';
+      document.getElementById('scanner').classList.remove('locked');
+      document.getElementById('scan-btn').disabled = false;
+    }
+
     async function scan() {
-      if (!isPaid) return alert("Abonnement requis");
+      if (document.getElementById('scanner').classList.contains('locked')) {
+        return alert("Abonnement requis");
+      }
 
       const file = document.getElementById('facture').files[0];
       const tpeEmail = document.getElementById('tpeEmail').value;
@@ -94,7 +100,7 @@
         document.getElementById("result").innerHTML = `
           <pre style="text-align:left; font-size:12px;">${text}</pre><br>
           <a href="${url}" download="facture_pennylane.pdf">Télécharger PDF</a><br>
-          <p style="color:green; font-weight:bold;">PDF prêt – Abonne-toi pour usage illimité</p>
+          <p style="color:green; font-weight:bold;">PDF prêt – Accès illimité</p>
         `;
       }
     }
