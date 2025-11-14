@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compta Auto – Pour comptables</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
   <style>
     body { font-family: Arial; text-align: center; background: #f4f4f4; margin: 0; padding: 20px; }
     .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
@@ -21,12 +20,12 @@
   <div class="container">
     <h1>Compta Auto – Pour comptables</h1>
     <p>Vos TPE envoient photo → PDF auto → import direct dans Pennylane</p>
-    <p style="font-weight:bold; color:#e74c3c;">7 jours GRATUIT – Annulation quand tu veux</p>
+    <p style="font-weight:bold; color:#e74c3c;">Accès immédiat après paiement</p>
 
     <div id="paywall">
       <p class="price">49 € / mois</p>
-      <button id="checkout-button">S'abonner (7 jours gratuit)</button>
-      <p><small>Carte requise – Annulation 1 clic</small></p>
+      <button onclick="window.location.href='https://buy.stripe.com/test_4gM9AU2fUdZwaEhgY493y04'">Payer & Accéder</button>
+      <p><small>Annulation 1 clic – Accès illimité</small></p>
     </div>
 
     <div id="scanner" class="locked">
@@ -39,30 +38,18 @@
   </div>
 
   <script>
-    const stripe = Stripe('pk_test_51SSfm6J5kUYnkFiUAI90qtKYCeTK2EInJzdZgnVAVUp3VwyBLEExoYR9dwRgv3WCckg3MIbhE15TfzNJqOsaEN9100Lg7Oawdg'); // ← TA CLÉ PUBLIABLE STRIPE
-    const PRICE_ID = 'price_1STFfGJ5kUYnkFiUSp4NGfro'; // ← TON ID DE PRIX STRIPE
-
-    document.getElementById('checkout-button').addEventListener('click', () => {
-      fetch('https://ton-serveur.com/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: PRICE_ID })
-      })
-      .then(res => res.json())
-      .then(session => stripe.redirectToCheckout({ sessionId: session.id }));
-    });
-
-    // VÉRIFIE SI L'UTILISATEUR EST PAYANT (via cookie ou URL)
+    // VÉRIFIE SI L'UTILISATEUR A PAYÉ
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('paid') === 'true') {
       document.getElementById('paywall').style.display = 'none';
       document.getElementById('scanner').classList.remove('locked');
       document.getElementById('scan-btn').disabled = false;
+      document.getElementById('result').innerHTML = '<p style="color:green;">Accès activé ! Vous pouvez scanner.</p>';
     }
 
     async function scan() {
       if (document.getElementById('scanner').classList.contains('locked')) {
-        return alert("Abonnement requis");
+        return alert("Paiement requis");
       }
 
       const file = document.getElementById('facture').files[0];
