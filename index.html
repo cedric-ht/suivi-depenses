@@ -11,8 +11,10 @@
     .container { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
     input, button { padding: 12px; margin: 10px; font-size: 16px; width: 80%; }
     button { background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:disabled { background: #95a5a6; cursor: not-allowed; }
     .price { font-size: 28px; color: #27ae60; font-weight: bold; margin: 20px 0; }
     #result { margin-top:20px; white-space: pre-wrap; }
+    .locked { opacity: 0.5; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -20,24 +22,43 @@
     <h1>Compta Auto – Pour comptables</h1>
     <p>Vos TPE envoient photo → PDF auto → import direct dans Pennylane</p>
     <p style="font-weight:bold; color:#e74c3c;">7 jours GRATUIT – Annulation quand tu veux</p>
-    <input type="file" id="facture" accept="image/*">
-    <input type="email" id="tpeEmail" placeholder="Email du TPE">
-    <button onclick="scan()">Tester GRATUIT</button>
-    <p class="price">49 € / mois</p>
-    <button id="checkout-button">S'abonner (7 jours gratuit)</button>
+
+    <!-- PAYWALL -->
+    <div id="paywall">
+      <p class="price">49 € / mois</p>
+      <button id="checkout-button">S'abonner (7 jours gratuit)</button>
+      <p><small>Accès illimité après paiement</small></p>
+    </div>
+
+    <!-- SCANNER (BLOQUÉ JUSQU'AU PAIEMENT) -->
+    <div id="scanner" class="locked">
+      <input type="file" id="facture" accept="image/*">
+      <input type="email" id="tpeEmail" placeholder="Email du TPE">
+      <button onclick="scan()" disabled id="scan-btn">Scanner & Générer PDF</button>
+    </div>
+
     <div id="result"></div>
   </div>
 
   <script>
-    const stripe = Stripe('pk_test_51...'); // ← REMPLACE PAR TA CLÉ PUBLIABLE STRIPE
+    const stripe = Stripe('pk_test_51...'); // ← MET TA CLÉ STRIPE ICI
+    let isPaid = false;
 
+    // Simule un paiement (à remplacer par un vrai webhook plus tard)
     document.getElementById('checkout-button').addEventListener('click', () => {
-      fetch('https://ton-serveur.com/create-checkout', { method: 'POST' })
-        .then(res => res.json())
-        .then(session => stripe.redirectToCheckout({ sessionId: session.id }));
+      // Simulation de paiement réussi
+      setTimeout(() => {
+        isPaid = true;
+        document.getElementById('paywall').style.display = 'none';
+        document.getElementById('scanner').classList.remove('locked');
+        document.getElementById('scan-btn').disabled = false;
+        document.getElementById('result').innerHTML = '<p style="color:green;">Abonnement activé ! Vous pouvez scanner.</p>';
+      }, 1000);
     });
 
     async function scan() {
+      if (!isPaid) return alert("Abonnement requis");
+
       const file = document.getElementById('facture').files[0];
       const tpeEmail = document.getElementById('tpeEmail').value;
       if (!file || !tpeEmail) return alert("Photo + email requis");
