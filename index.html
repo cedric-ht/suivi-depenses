@@ -19,11 +19,11 @@
 <body>
   <div class="container">
     <h1>Compta Auto – Pour comptables</h1>
-    <p>Vos TPE envoient photo facture → PDF auto → import direct dans Pennylane</p>
+    <p>Vos TPE envoient photo → PDF auto → import direct dans Pennylane</p>
     <p style="font-weight:bold; color:#e74c3c;">🔥 7 jours GRATUIT – Annulation quand tu veux</p>
     <input type="file" id="facture" accept="image/*">
-    <input type="email" id="email" placeholder="Email du TPE" style="width:80%; padding:12px; margin:10px;">
-    <button onclick="scan()">Scanner & Générer PDF</button>
+    <input type="email" id="tpeEmail" placeholder="Email du TPE">
+    <button onclick="scan()">Scanner & Générer PDF Pennylane</button>
     <p class="price">49 € / mois</p>
     <button onclick="payer()">Payer avec Stripe</button>
     <div id="result"></div>
@@ -32,22 +32,22 @@
   <script>
     async function scan() {
       const file = document.getElementById('facture').files[0];
-      const email = document.getElementById('email').value;
+      const tpeEmail = document.getElementById('tpeEmail').value;
       if (!file) return alert("Choisis une photo");
-      if (!email) return alert("Entre l'email du TPE");
+      if (!tpeEmail) return alert("Entre l'email du TPE");
 
       document.getElementById("result").innerHTML = "Scan en cours...";
 
       const { data: { text } } = await Tesseract.recognize(file, 'fra');
 
-      const pdfText = `Facture reçue de ${email}\n\n${text}\n\nPrêt à importer dans Pennylane.`;
+      const pdfText = `Facture reçue de ${tpeEmail}\n\n${text}\n\nPrêt à importer dans Pennylane (PDF structuré).`;
       const blob = new Blob([pdfText], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
 
       document.getElementById("result").innerHTML = `
         <pre>${pdfText}</pre><br>
-        <a href="${url}" download="facture.pdf">Télécharger PDF</a><br>
-        <p style="color:green; font-weight:bold;">PDF prêt pour Pennylane</p>
+        <a href="${url}" download="facture_pennylane.pdf">Télécharger PDF pour Pennylane</a><br>
+        <p style="color:green; font-weight:bold;">PDF prêt à importer (drag & drop dans Achats)</p>
       `;
     }
 
